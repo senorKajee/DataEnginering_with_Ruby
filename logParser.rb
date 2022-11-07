@@ -1,9 +1,18 @@
 require "csv"
-def parsedLog
-  fileName  = 'data/access_log_20190521-211058.log'
-  accessLogLines = File.open(fileName,'r') do |f|
-    f.readlines
+require "pp"
+
+def getFile
+  matchingFile = Dir['data/access_log_*-*.log']
+  parsingResult = matchingFile.map do |file|
+    accessLogLines = File.open(file,'r') do |f|
+      f.readlines
+    end
+    parsedLog(accessLogLines)
   end
+  pp parsingResult
+
+end
+def parsedLog(accessLogLines)
 
   signUpLogLines = accessLogLines.select do |line|
     line.include?('/signup?email=')
@@ -70,5 +79,5 @@ def crossReference(logLine)
 end
 
 
-puts parsedLog
+pp getFile
 
