@@ -12,11 +12,15 @@ def parsedLog
   userData = signUpLogLines.map do |line|
     parsedArray = line.split('" "')
     email = extractEmail(parsedArray.first)
-    userAgentString = line.split('" "').last
+    userAgentString = parsedArray.last
     browser = dertermineBrowser(userAgentString)
     [email,browser]
   end
-  puts userData
+
+  cressReferencesData = userData.map do |line|
+    crossReference(line)
+  end
+  cressReferencesData
 end
 
 
@@ -24,12 +28,12 @@ def dertermineBrowser(userAgent)
   return "Firefox" if userAgent.include?("Firefox")&&userAgent.include?("Gecko")
   return "Chrome" if userAgent.include?("Chrome")
   return "Safari" if userAgent.include?("Safari")&&userAgent.include?("Gecko")
-  return "Other"
+  "Other"
 end
 
 def extractEmail(logLine)
   email =  logLine.match(/signup\?email\=([A-Za-z0-9@.]*) HTTP\//)
-  email.captures
+  email.captures.first
 end
 
 def crossReference(logLine)
@@ -52,10 +56,19 @@ def crossReference(logLine)
         line.push(email)
       end
     end
+    line
   end
-  users
+  matchingUser = users.select do |line|
+    logLine[0] == line[2]
+  end
+  matchingUser = matchingUser.first
+
+  {firstname: matchingUser[1],
+   lastname: matchingUser[0] ,
+   email: matchingUser[2],
+   browser: logLine[1]}
 end
 
-p crossReference("")
-#parsedLog
+
+puts parsedLog
 
